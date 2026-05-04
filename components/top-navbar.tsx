@@ -10,7 +10,7 @@ export function TopNavbar({ mode = "public" }: { mode?: "public" | "dashboard" }
           <span className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-500/15 text-cyan-200">
             <ShieldCheck className="h-5 w-5" />
           </span>
-          <span>FraudGuard Rekber AI</span>
+          <span>mAIst</span>
         </Link>
         {mode === "dashboard" ? (
           <div className="hidden min-w-80 items-center gap-2 rounded-md border border-slate-500/20 bg-slate-950/40 px-3 py-2 text-sm text-slate-400 md:flex">

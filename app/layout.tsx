@@ -21,7 +21,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FraudGuard Rekber AI",
+  title: "mAIst",
   description:
     "Simulasi deteksi fraud real-time, skor risiko rekening, dan rekber bank untuk transaksi jual beli online."
 };

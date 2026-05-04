@@ -1,6 +1,6 @@
-# FraudGuard Rekber AI
+# mAIst
 
-FraudGuard Rekber AI is a professional hackathon prototype for banking fraud detection and secure escrow, focused on preventing triangle transaction scams in social commerce flows such as Facebook, Instagram, WhatsApp, and informal marketplaces.
+mAIst is a professional hackathon prototype for banking fraud detection and secure escrow, focused on preventing triangle transaction scams in social commerce flows such as Facebook, Instagram, WhatsApp, and informal marketplaces.
 
 The application uses mock data and simulated APIs only. It does not integrate with Bank Indonesia, OJK, CekRekening.id, real banks, couriers, marketplaces, or payment rails.
 

@@ -20,6 +20,6 @@ export async function POST(request: Request) {
   return NextResponse.json({
     escrow,
     link: `/rekber/${escrow.caseId}`,
-    publicUrl: `https://fraudguard.demo/rekber/${escrow.caseId}`
+    publicUrl: `https://maist.demo/rekber/${escrow.caseId}`
   });
 }

@@ -44,7 +44,7 @@ export function HeroSection() {
             Pendukung keputusan fraud setara bank untuk social commerce
           </p>
           <h1 className="max-w-3xl text-balance text-5xl font-semibold tracking-normal text-white sm:text-6xl">
-            FraudGuard Rekber AI
+            mAIst
           </h1>
           <p className="mt-6 max-w-2xl text-balance text-lg leading-8 text-slate-300">
             Deteksi fraud real-time, skor risiko rekening, dan rekber bank aman untuk mencegah penipuan transaksi segitiga.
