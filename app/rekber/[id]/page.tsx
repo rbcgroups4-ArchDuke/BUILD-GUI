@@ -62,7 +62,7 @@ export default async function RekberPaymentPage({ params }: { params: Promise<{ 
               <div className="grid gap-2 sm:grid-cols-2">
                 <Link href={`/rekber/${escrow.caseId}/chat`} className={buttonVariants({ variant: "default" })}>
                   <Bot className="h-4 w-4" />
-                  Chat AI Rekber
+                  Chat mAIst
                 </Link>
                 <Link href={`/rekber/${escrow.caseId}/tracking`} className={buttonVariants({ variant: "outline" })}>
                   <Truck className="h-4 w-4" />

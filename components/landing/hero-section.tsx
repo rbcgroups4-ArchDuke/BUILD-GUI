@@ -133,7 +133,7 @@ export function HeroSection() {
               Tinjauan manusia tetap wajib
             </p>
             <p className="text-sm text-slate-400">
-              AI membantu menjelaskan risiko. Keputusan sengketa dan pembekuan tetap dibuat oleh staff bank berwenang.
+              mAIst membantu menjelaskan risiko. Keputusan sengketa dan pembekuan tetap dibuat oleh staff bank berwenang.
             </p>
           </div>
         </motion.div>

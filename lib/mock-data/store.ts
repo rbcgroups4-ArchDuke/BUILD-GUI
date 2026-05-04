@@ -110,7 +110,7 @@ export function createOrUpdateDispute(caseId: string, input: Partial<Dispute>) {
       "Komplain pembeli, status kurir, dan riwayat penjual menunjukkan dana perlu tetap ditahan saat staff meninjau bukti.",
     aiRecommendation:
       input.aiRecommendation ??
-      "Rekomendasi AI: tahan dana dan eskalasi ke staff bank. AI hanya pendukung keputusan; keputusan akhir harus dibuat staff bank berwenang.",
+      "Rekomendasi mAIst: tahan dana dan eskalasi ke staff bank. mAIst hanya pendukung keputusan; keputusan akhir harus dibuat staff bank berwenang.",
     createdAt: new Date().toISOString(),
     staffDecision: input.staffDecision
   };
@@ -126,7 +126,7 @@ function initialChatMessages(escrow: EscrowCase): RekberChatMessage[] {
       messageId: `${escrow.caseId}-CHAT-001`,
       caseId: escrow.caseId,
       senderRole: "ai",
-      senderName: "AI Rekber Bank",
+      senderName: "mAIst",
       message:
         `Ruang Rekber resmi dibuat untuk ${escrow.itemName}. Saya akan menjadi penengah otomatis. Pembeli hanya membayar lewat tombol pembayaran di aplikasi bank, bukan lewat screenshot atau rekening chat luar.`,
       timestamp: new Date(baseTime + 60_000).toISOString()
@@ -144,14 +144,14 @@ function initialChatMessages(escrow: EscrowCase): RekberChatMessage[] {
       caseId: escrow.caseId,
       senderRole: "buyer",
       senderName: "Pembeli",
-      message: "Saya setuju pakai Rekber Bank. Tolong AI pantau sampai barang/data diterima.",
+    message: "Saya setuju pakai Rekber Bank. Tolong mAIst pantau sampai barang/data diterima.",
       timestamp: new Date(baseTime + 180_000).toISOString()
     },
     {
       messageId: `${escrow.caseId}-CHAT-004`,
       caseId: escrow.caseId,
       senderRole: "ai",
-      senderName: "AI Rekber Bank",
+      senderName: "mAIst",
       message:
         "Aturan aman: penjual jangan kirim barang, kode akun, email, password, atau data digital sebelum status di aplikasi berubah menjadi Funds Secured. Bukti transfer dari chat luar tidak cukup.",
       timestamp: new Date(baseTime + 240_000).toISOString()
@@ -204,7 +204,7 @@ export function addRekberChatMessage(caseId: string, senderRole: ChatSenderRole,
   if (!escrow) return undefined;
   const messages = getRekberChatMessages(caseId);
   if (!messages) return undefined;
-  const senderName = senderRole === "seller" ? "Penjual" : senderRole === "buyer" ? "Pembeli" : "AI Rekber Bank";
+  const senderName = senderRole === "seller" ? "Penjual" : senderRole === "buyer" ? "Pembeli" : "mAIst";
   const userMessage: RekberChatMessage = {
     messageId: `${caseId}-CHAT-${String(messages.length + 1).padStart(3, "0")}`,
     caseId,
@@ -220,7 +220,7 @@ export function addRekberChatMessage(caseId: string, senderRole: ChatSenderRole,
       messageId: `${caseId}-CHAT-${String(messages.length + 1).padStart(3, "0")}`,
       caseId,
       senderRole: "ai",
-      senderName: "AI Rekber Bank",
+      senderName: "mAIst",
       message: aiReplyFor(escrow, message, senderRole),
       timestamp: new Date(Date.now() + 800).toISOString(),
       metadata: { automated: true, escrowStatus: escrow.status }

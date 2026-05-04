@@ -8,11 +8,11 @@ The application uses mock data and simulated APIs only. It does not integrate wi
 
 - Public fintech landing page with animated dashboard preview and clear demo positioning.
 - Customer fraud check page with explainable account risk scoring.
-- AI Rekber scam typology for fake chat-group escrow, noreff/refund wording, payment receipt screenshots, and “dana sudah masuk” pressure messages.
+- mAIst scam typology for fake chat-group escrow, noreff/refund wording, payment receipt screenshots, and “dana sudah masuk” pressure messages.
 - Hybrid FDS module from the proposal: rule-based engine plus simulated Isolation Forest, customer behavior features, combined final risk score, transaction auto stream, and analyst actions.
 - Transfer simulation that blocks high-risk demo transfers and recommends bank escrow.
 - Seller Rekber Link creation flow with generated mock escrow URL.
-- AI Rekber chat room where buyer, seller, and an automated bank mediator coordinate the transaction.
+- mAIst chat room where buyer, seller, and an automated bank mediator coordinate the transaction.
 - Buyer escrow payment page with simulated bank wallet status.
 - Courier tracking simulation with escrow status timeline.
 - Buyer dispute page with evidence placeholder and AI decision-support summary.
@@ -104,7 +104,7 @@ Risk levels:
 4. The system returns **Critical Risk 87/100**.
 5. Click **Use Bank Rekber Link**.
 6. Create a Rekber Link for an iPhone 13 sold via Facebook.
-7. Open AI Rekber Chat and send buyer/seller messages.
+7. Open mAIst Chat and send buyer/seller messages.
 8. Open the buyer payment page and simulate payment into escrow.
 9. Open tracking and submit the mocked courier tracking number.
 10. Tracking moves to delivered.

@@ -6,17 +6,17 @@ import type { Dispute } from "@/types";
 export function DisputeAssistantPanel({ dispute }: { dispute?: Dispute | null }) {
   const summary =
     dispute?.aiSummary ??
-    "Pendukung keputusan AI akan merangkum komplain pembeli, status bukti, timeline kurir, dan riwayat sengketa penjual.";
+    "mAIst akan merangkum komplain pembeli, status bukti, timeline kurir, dan riwayat sengketa penjual sebagai pendukung keputusan.";
   const recommendation =
     dispute?.aiRecommendation ??
-    "Rekomendasi AI: tahan pencairan sampai bukti ditinjau. Tindakan akhir harus disetujui staff bank berwenang.";
+    "Rekomendasi mAIst: tahan pencairan sampai bukti ditinjau. Tindakan akhir harus disetujui staff bank berwenang.";
 
   return (
     <Card className="border-cyan-400/20">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <BrainCircuit className="h-5 w-5 text-cyan-300" />
-          Asisten sengketa AI
+          Asisten sengketa mAIst
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

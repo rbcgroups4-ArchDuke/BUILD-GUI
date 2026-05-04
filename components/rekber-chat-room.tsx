@@ -53,10 +53,10 @@ export function RekberChatRoom({
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Bot className="h-5 w-5 text-cyan-300" />
-                Chat Transaksi AI Rekber
+                Chat Transaksi mAIst
               </CardTitle>
               <p className="mt-2 text-sm text-slate-400">
-                AI bank menjadi penengah otomatis antara penjual dan pembeli.
+                mAIst menjadi penengah otomatis antara penjual dan pembeli.
               </p>
             </div>
             <Badge variant={escrow.status === "Funds Secured" ? "success" : "warning"}>{statusLabel(escrow.status)}</Badge>
@@ -141,7 +141,7 @@ export function RekberChatRoom({
               {officialStatus}
             </div>
             <p className="text-sm leading-6 text-slate-400">
-              AI Rekber hanya percaya status dari sistem bank di aplikasi ini. Screenshot transfer, grup luar, atau pesan "dana sudah masuk" tidak dianggap valid.
+              mAIst hanya percaya status dari sistem bank di aplikasi ini. Screenshot transfer, grup luar, atau pesan "dana sudah masuk" tidak dianggap valid.
             </p>
             <Link href={`/rekber/${escrow.caseId}`} className={buttonVariants({ variant: "default", className: "w-full" })}>
               <Wallet className="h-4 w-4" />

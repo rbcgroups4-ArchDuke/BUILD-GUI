@@ -64,7 +64,7 @@ export function RekberCreateForm() {
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link href={`/rekber/${created.escrow.caseId}/chat`} className={buttonVariants({ variant: "default" })}>
               <Bot className="h-4 w-4" />
-              Buka Chat AI Rekber
+              Buka Chat mAIst
             </Link>
             <Link href={`/rekber/${created.escrow.caseId}`} className={buttonVariants({ variant: "outline" })}>
               Buka halaman pembayaran pembeli

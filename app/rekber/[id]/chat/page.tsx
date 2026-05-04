@@ -14,10 +14,10 @@ export default async function RekberChatPage({ params }: { params: Promise<{ id:
       <TopNavbar />
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-8 max-w-3xl">
-          <p className="text-sm font-semibold uppercase text-cyan-300">Chat AI Rekber</p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-normal">Ruang chat resmi penjual, pembeli, dan AI bank.</h1>
+          <p className="text-sm font-semibold uppercase text-cyan-300">Chat mAIst</p>
+          <h1 className="mt-3 text-4xl font-semibold tracking-normal">Ruang chat resmi penjual, pembeli, dan mAIst.</h1>
           <p className="mt-4 text-slate-400">
-            AI menjadi penengah otomatis, memberi arahan aman, dan mencegah pelepasan barang/data sebelum dana aman di escrow bank.
+            mAIst menjadi penengah otomatis, memberi arahan aman, dan mencegah pelepasan barang/data sebelum dana aman di escrow bank.
           </p>
         </div>
         <RekberChatRoom escrow={escrow} initialMessages={messages} />
