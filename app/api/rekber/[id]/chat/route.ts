@@ -1,33 +1,76 @@
 import { NextResponse } from "next/server";
 import { addRekberChatMessage, getRekberChatMessages } from "@/lib/mock-data/store";
 import type { ChatSenderRole } from "@/types";
+import { logApiCall, logAction, getRequestContext, createTimer } from "@/lib/logger";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ id: string }> }
 ) {
+  const timer = createTimer();
+  const requestContext = getRequestContext(request);
   const { id } = await context.params;
-  const messages = getRekberChatMessages(id);
-  if (!messages) {
-    return NextResponse.json({ error: "Rekber case not found" }, { status: 404 });
+
+  try {
+    const messages = getRekberChatMessages(id);
+    if (!messages) {
+      logApiCall("GET", `/api/rekber/${id}/chat`, 404, timer.end(), requestContext);
+      return NextResponse.json({ error: "Rekber case not found" }, { status: 404 });
+    }
+
+    logApiCall("GET", `/api/rekber/${id}/chat`, 200, timer.end(), requestContext);
+    return NextResponse.json({ messages });
+  } catch (error) {
+    logApiCall("GET", `/api/rekber/${id}/chat`, 500, timer.end(), requestContext);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-  return NextResponse.json({ messages });
 }
 
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> }
 ) {
+  const timer = createTimer();
+  const requestContext = getRequestContext(request);
   const { id } = await context.params;
-  const body = await request.json();
-  const senderRole = (body.senderRole === "seller" ? "seller" : "buyer") as ChatSenderRole;
-  const message = String(body.message ?? "").trim();
-  if (!message) {
-    return NextResponse.json({ error: "Message is required" }, { status: 400 });
+
+  try {
+    const body = await request.json();
+    const senderRole = (body.senderRole === "seller" ? "seller" : "buyer") as ChatSenderRole;
+    const message = String(body.message ?? "").trim();
+
+    if (!message) {
+      logApiCall("POST", `/api/rekber/${id}/chat`, 400, timer.end(), requestContext);
+      return NextResponse.json({ error: "Message is required" }, { status: 400 });
+    }
+
+    const messages = addRekberChatMessage(id, senderRole, message);
+    if (!messages) {
+      logAction("chat_message_case_not_found", {
+        action: "chat_message_case_not_found",
+        resource: `escrow_${id}`,
+        success: false,
+        duration: timer.end(),
+        context: requestContext
+      });
+
+      logApiCall("POST", `/api/rekber/${id}/chat`, 404, timer.end(), requestContext);
+      return NextResponse.json({ error: "Rekber case not found" }, { status: 404 });
+    }
+
+    logAction("chat_message_sent", {
+      action: "chat_message_sent",
+      resource: `escrow_${id}`,
+      newState: { sender: senderRole, message_count: messages.length },
+      success: true,
+      duration: timer.end(),
+      context: requestContext
+    });
+
+    logApiCall("POST", `/api/rekber/${id}/chat`, 200, timer.end(), requestContext);
+    return NextResponse.json({ messages });
+  } catch (error) {
+    logApiCall("POST", `/api/rekber/${id}/chat`, 500, timer.end(), requestContext);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-  const messages = addRekberChatMessage(id, senderRole, message);
-  if (!messages) {
-    return NextResponse.json({ error: "Rekber case not found" }, { status: 404 });
-  }
-  return NextResponse.json({ messages });
 }
