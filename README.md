@@ -132,3 +132,14 @@ Risk levels:
 ## Future Integration Possibilities
 
 Future production versions could integrate authorized bank systems, verified account-reporting sources, regulator-compliant workflows, marketplace signals, payment rails, courier tracking, and formal case-management systems. Those are intentionally shown as future possibilities only.
+
+## Future Integration Possibilities
+
+Future production versions could integrate authorized bank systems, verified account-reporting sources, regulator-compliant workflows, marketplace signals, payment rails, courier tracking, and formal case-management systems. Those are intentionally shown as future possibilities only.
+
+## Backend Security & Architecture
+
+- **Secure Endpoints**: Specific API routes (e.g., `/api/accounts/:accountNumber`) are protected using API Key validation via the `x-api-key` header.
+- **Audit Trail Logging**: A comprehensive logging system is implemented using `pino` (`/lib/logger.ts`). It supports pretty console output for development and persistent file-based logging (`logs/app.log`) for production audit trails.
+- **Separation of Concerns**: The project structure strictly separates UI Components (`/components`), API Routing (`/app/api`), and Business Logic (`/lib`) to ensure the codebase remains maintainable and ready for future production scale.
+- 
