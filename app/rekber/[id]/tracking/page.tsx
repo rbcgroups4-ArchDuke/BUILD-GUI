@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { TopNavbar } from "@/components/top-navbar";
+import { TopNavbar } from "@/components/layout/top-navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrackingForm } from "@/components/tracking-form";
+import { TrackingForm } from "@/components/rekber/tracking-form";
 import { getEscrowCase } from "@/lib/mock-data/store";
 
 export default async function TrackingPage({ params }: { params: Promise<{ id: string }> }) {

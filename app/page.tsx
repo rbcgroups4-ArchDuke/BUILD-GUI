@@ -14,10 +14,10 @@ import {
 } from "lucide-react";
 import { HeroSection } from "@/components/landing/hero-section";
 import { FeatureCard } from "@/components/landing/feature-card";
-import { TopNavbar } from "@/components/top-navbar";
+import { TopNavbar } from "@/components/layout/top-navbar";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AccountGraph } from "@/components/dashboard/account-graph";
+import { LazyAccountGraph } from "@/components/dashboard/lazy-account-graph";
 import { dashboardGraph } from "@/lib/mock-data/store";
 
 export default function LandingPage() {
@@ -125,7 +125,7 @@ export default function LandingPage() {
             Buka dashboard
           </Link>
         </div>
-        <AccountGraph nodes={graph.nodes} edges={graph.edges} />
+        <LazyAccountGraph nodes={graph.nodes} edges={graph.edges} />
         <div className="mt-4">
           <Link href="/dashboard/hybrid-fds" className={buttonVariants({ variant: "default" })}>
             <Activity className="h-4 w-4" />

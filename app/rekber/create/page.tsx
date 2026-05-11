@@ -1,5 +1,5 @@
-import { RekberCreateForm } from "@/components/rekber-create-form";
-import { TopNavbar } from "@/components/top-navbar";
+import { RekberCreateForm } from "@/components/rekber/rekber-create-form";
+import { TopNavbar } from "@/components/layout/top-navbar";
 
 export default function RekberCreatePage() {
   return (

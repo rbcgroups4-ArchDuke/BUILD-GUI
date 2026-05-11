@@ -1,14 +1,14 @@
 "use client";
 
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, memo } from "react";
 import { AlertTriangle, ShieldCheck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RiskLevelBadge } from "@/components/status-badge";
+import { RiskLevelBadge } from "@/components/shared/status-badge";
 import type { RiskLevel } from "@/types";
 import { cn } from "@/lib/utils";
 
-export function RiskScoreCard({
+export const RiskScoreCard = memo(function RiskScoreCard({
   score,
   level,
   compact = false
@@ -60,4 +60,4 @@ export function RiskScoreCard({
       </CardContent>
     </Card>
   );
-}
+});

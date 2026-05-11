@@ -1,5 +1,5 @@
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import { TopNavbar } from "@/components/top-navbar";
+import { TopNavbar } from "@/components/layout/top-navbar";
 import { CaseManagementTable } from "@/components/dashboard/case-management-table";
 import { dashboardCases } from "@/lib/mock-data/store";
 

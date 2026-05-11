@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createOrUpdateDispute, getEscrowCase } from "@/lib/mock-data/store";
+import { generateDisputeDecisionSupport } from "@/lib/ai/rekber-assistant";
+import { createOrUpdateDispute, getEscrowCase, getRekberChatMessages } from "@/lib/mock-data/store";
 import { logApiCall, logAction, getRequestContext, createTimer } from "@/lib/logger";
 
 export async function POST(
@@ -23,12 +24,19 @@ export async function POST(
       body.complaint ??
         "Paket sudah tiba tetapi barang tidak sesuai invoice. Pembeli meminta pencairan dana ditahan."
     );
+    const decisionSupport = await generateDisputeDecisionSupport({
+      escrow,
+      complaint,
+      recentMessages: getRekberChatMessages(id) ?? []
+    });
     const dispute = createOrUpdateDispute(id, {
       buyerComplaint: complaint,
       evidenceStatus: "Uploaded",
       aiSummary:
-        "Pendukung keputusan mAIst: invoice menyebut iPhone 13, bukti pembeli menunjukkan paket kosong, berat kurir tidak konsisten dengan perkiraan berat barang, dan penjual punya riwayat sengketa.",
+        decisionSupport?.summary ??
+        "Pendukung keputusan mAIst: komplain pembeli, status transaksi, dan konteks chat menunjukkan dana perlu ditahan sampai bukti ditinjau staff bank.",
       aiRecommendation:
+        decisionSupport?.recommendation ??
         "Rekomendasi mAIst: tahan dana dan eskalasi ke staff bank. Keputusan refund, pencairan, pembekuan, atau permintaan bukti harus dibuat oleh staff bank berwenang."
     });
 

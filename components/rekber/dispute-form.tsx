@@ -5,7 +5,7 @@ import { FileUp, Loader2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { DisputeAssistantPanel } from "@/components/dispute-assistant-panel";
+import { DisputeAssistantPanel } from "@/components/rekber/dispute-assistant-panel";
 import type { Dispute, EscrowCase } from "@/types";
 
 export function DisputeForm({ escrow, initialDispute }: { escrow: EscrowCase; initialDispute?: Dispute | null }) {

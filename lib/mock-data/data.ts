@@ -286,13 +286,13 @@ export const escrowCases: EscrowCase[] = [
     sellerAccount: "1234567890",
     buyerAccount: "6611223344",
     amount: 6500000,
-    escrowFee: 65000,
+    escrowFee: 100000,
     courier: "JNE",
-    trackingNumber: "JNE-8821-4409-ID",
-    status: "Delivered",
+    trackingNumber: undefined,
+    status: "Link Created",
     createdAt: new Date(now.getTime() - 30 * 60 * 60 * 1000).toISOString(),
     releaseDeadline: new Date(now.getTime() + 18 * 60 * 60 * 1000).toISOString(),
-    disputeStatus: "Open"
+    disputeStatus: "None"
   },
   ...Array.from({ length: 7 }, (_, index) => ({
     caseId: `RKB-2026-00013${index}`,
@@ -316,13 +316,13 @@ export const escrowCases: EscrowCase[] = [
 export const disputes: Dispute[] = [
   {
     disputeId: "DSP-2026-0091",
-    caseId: "RKB-2026-000129",
-    buyerComplaint: "Package arrived, but the box was empty and courier weight looks inconsistent.",
+    caseId: "RKB-2026-000136",
+    buyerComplaint: "Buyer reports item mismatch and requests temporary fund hold while evidence is reviewed.",
     evidenceStatus: "Uploaded",
     aiSummary:
-      "Buyer reports an empty package for an iPhone 13 transaction. Courier weight is below expected device and packaging weight. Seller account has prior dispute history.",
+      "Buyer reports item mismatch and asks for a temporary hold while courier and evidence details are reviewed.",
     aiRecommendation:
-      "Hold funds and escalate to authorized bank staff. Request courier weight proof and unboxing evidence before any release decision.",
+      "Hold funds and escalate to authorized bank staff. Request additional evidence before any release decision.",
     createdAt: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString()
   },
   ...Array.from({ length: 4 }, (_, index) => ({

@@ -1,7 +1,7 @@
 import { Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { StatusBadge } from "@/components/status-badge";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { caseTitleLabel, caseTypeLabel } from "@/lib/i18n";
 import { formatDateTime } from "@/lib/utils";
 import type { AnalystCase } from "@/types";

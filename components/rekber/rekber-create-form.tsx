@@ -31,18 +31,24 @@ export function RekberCreateForm() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
+    if (loading) return; // Prevent multiple submissions
     setLoading(true);
-    const response = await fetch("/api/rekber/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        amount: Number(form.itemPrice),
-        escrowFee: Number(form.escrowFee)
-      })
-    });
-    setCreated(await response.json());
-    setLoading(false);
+    try {
+      const response = await fetch("/api/rekber/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          amount: Number(form.itemPrice),
+          escrowFee: Number(form.escrowFee)
+        })
+      });
+      setCreated(await response.json());
+    } catch (error) {
+      console.error("Failed to create rekber:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (created) {

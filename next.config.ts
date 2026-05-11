@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  distDir: process.env.NODE_ENV === "production" ? ".next" : ".next-dev",
   typedRoutes: false,
   headers: async () => {
     return [
@@ -13,7 +14,7 @@ const nextConfig: NextConfig = {
           // ====================================================================
           {
             key: "Access-Control-Allow-Origin",
-            value: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+            value: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001",
           },
           {
             key: "Access-Control-Allow-Methods",

@@ -1,3 +1,4 @@
+import "server-only";
 import pino from 'pino';
 import path from 'path';
 import fs from 'fs';
@@ -43,24 +44,13 @@ const baseLogger = pino(
   },
   // Output destination
   isProduction
-    ? // Production: File-based logging
-      pino.transport({
-        target: 'pino/file',
-        options: {
-          destination: path.join(logsDir, 'app.log'),
-          mkdir: true,
-        },
+    ? // Production: file destination without worker transport
+      pino.destination({
+        dest: path.join(logsDir, 'app.log'),
+        mkdir: true,
+        sync: false,
       })
-    : // Development: Pretty console output
-      pino.transport({
-        target: 'pino-pretty',
-        options: {
-          colorize: true,
-          singleLine: false,
-          translateTime: 'HH:MM:ss Z',
-          ignore: 'pid,hostname',
-        },
-      })
+    : undefined // Development: Direct console output without transport
 );
 
 // ===================================================================

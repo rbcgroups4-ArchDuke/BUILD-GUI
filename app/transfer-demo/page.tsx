@@ -1,5 +1,5 @@
-import { TopNavbar } from "@/components/top-navbar";
-import { TransactionSimulator } from "@/components/transaction-simulator";
+import { TopNavbar } from "@/components/layout/top-navbar";
+import { TransactionSimulator } from "@/components/fraud/transaction-simulator";
 
 export default function TransferDemoPage() {
   return (

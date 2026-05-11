@@ -1,5 +1,5 @@
-import { AccountCheckForm } from "@/components/account-check-form";
-import { TopNavbar } from "@/components/top-navbar";
+import { AccountCheckForm } from "@/components/fraud/account-check-form";
+import { TopNavbar } from "@/components/layout/top-navbar";
 
 export default function FraudCheckPage() {
   return (

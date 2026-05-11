@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { StatusBadge } from "@/components/status-badge";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { formatRupiah } from "@/lib/utils";
 
 type Level = "Aman" | "Waspada" | "Risiko Tinggi" | "Risiko Kritis";

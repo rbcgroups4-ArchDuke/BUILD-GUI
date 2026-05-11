@@ -1,10 +1,10 @@
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import { TopNavbar } from "@/components/top-navbar";
+import { TopNavbar } from "@/components/layout/top-navbar";
 import { AnalystKpiCards } from "@/components/dashboard/analyst-kpi-cards";
-import { RiskTrendChart } from "@/components/dashboard/risk-trend-chart";
+import { LazyRiskTrendChart } from "@/components/dashboard/lazy-risk-trend-chart";
 import { FraudAlertTable } from "@/components/dashboard/fraud-alert-table";
-import { AccountGraph } from "@/components/dashboard/account-graph";
 import { CaseManagementTable } from "@/components/dashboard/case-management-table";
+import { LazyAccountGraph } from "@/components/dashboard/lazy-account-graph";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { dashboardAlerts, dashboardCases, dashboardGraph, dashboardSummary, getAuditLogs } from "@/lib/mock-data/store";
 
@@ -13,6 +13,7 @@ export default function DashboardPage() {
   const graph = dashboardGraph();
   const alerts = dashboardAlerts();
   const cases = dashboardCases().slice(0, 5);
+  const auditLogs = getAuditLogs();
   return (
     <main className="min-h-screen bg-[#020617] text-white">
       <TopNavbar mode="dashboard" />
@@ -26,19 +27,19 @@ export default function DashboardPage() {
           <div className="space-y-6">
             <AnalystKpiCards summary={summary} />
             <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
-              <RiskTrendChart data={summary.riskTrend} />
+              <LazyRiskTrendChart data={summary.riskTrend} />
               <Card>
                 <CardHeader>
                   <CardTitle>Simulasi audit log</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {getAuditLogs().map((log) => (
+                  {auditLogs.map((log) => (
                     <div key={log} className="rounded-md border border-slate-500/10 bg-slate-950/35 p-3 font-mono text-xs text-slate-300">{log}</div>
                   ))}
                 </CardContent>
               </Card>
             </div>
-            <AccountGraph nodes={graph.nodes} edges={graph.edges} />
+            <LazyAccountGraph nodes={graph.nodes} edges={graph.edges} />
             <FraudAlertTable alerts={alerts} />
             <CaseManagementTable cases={cases} />
           </div>

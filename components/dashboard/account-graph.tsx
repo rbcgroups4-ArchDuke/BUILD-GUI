@@ -41,6 +41,7 @@ export function AccountGraph({
       nodes.map((node) => ({
         id: node.id,
         position: positions[node.id] ?? { x: 0, y: 0 },
+        draggable: false,
         data: {
           label: (
             <div className="min-w-40">
@@ -77,7 +78,16 @@ export function AccountGraph({
 
   const graph = (
     <div className="h-[480px] overflow-hidden rounded-lg border border-slate-500/10 bg-slate-950/50">
-      <ReactFlow nodes={flowNodes} edges={flowEdges} fitView colorMode="dark">
+      <ReactFlow
+        nodes={flowNodes}
+        edges={flowEdges}
+        fitView
+        colorMode="dark"
+        zoomOnScroll={false}
+        zoomOnPinch={false}
+        zoomOnDoubleClick={false}
+        panOnScroll={false}
+      >
         <Background color="rgba(148,163,184,.22)" gap={18} />
         <MiniMap
           pannable
@@ -97,7 +107,7 @@ export function AccountGraph({
             overflow: "hidden"
           }}
         />
-        <Controls position="bottom-left" />
+        <Controls position="bottom-left" showInteractive={false} />
       </ReactFlow>
     </div>
   );

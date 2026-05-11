@@ -28,6 +28,11 @@ export async function POST(
     const oldStatus = escrow.status;
     const updated = updateEscrowCase(id, { status: "Funds Secured" });
 
+    if (!updated) {
+      logApiCall("POST", `/api/rekber/${id}/pay`, 500, timer.end(), requestContext);
+      return NextResponse.json({ error: "Failed to update rekber case" }, { status: 500 });
+    }
+
     logAction("escrow_payment_received", {
       action: "escrow_payment_received",
       resource: `escrow_${id}`,

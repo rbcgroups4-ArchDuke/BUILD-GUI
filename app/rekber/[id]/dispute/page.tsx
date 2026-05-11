@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { TopNavbar } from "@/components/top-navbar";
+import { TopNavbar } from "@/components/layout/top-navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DisputeForm } from "@/components/dispute-form";
+import { DisputeForm } from "@/components/rekber/dispute-form";
 import { getDisputeByCaseId, getEscrowCase } from "@/lib/mock-data/store";
 
 export default async function DisputePage({ params }: { params: Promise<{ id: string }> }) {

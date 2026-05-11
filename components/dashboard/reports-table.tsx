@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { StatusBadge } from "@/components/status-badge";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { fraudCategoryLabel, statusLabel } from "@/lib/i18n";
 import { formatDateTime, maskAccount } from "@/lib/utils";
 import type { ReportedAccount } from "@/types";

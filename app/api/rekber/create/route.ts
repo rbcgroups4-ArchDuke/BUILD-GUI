@@ -5,6 +5,7 @@ import { logApiCall, logAction, getRequestContext, createTimer } from "@/lib/log
 export async function POST(request: Request) {
   const timer = createTimer();
   const context = getRequestContext(request);
+  const appOrigin = process.env.NEXT_PUBLIC_APP_URL?.trim() || new URL(request.url).origin;
 
   try {
     const body = await request.json();
@@ -44,7 +45,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       escrow,
       link: `/rekber/${escrow.caseId}`,
-      publicUrl: `https://maist.demo/rekber/${escrow.caseId}`
+      publicUrl: `${appOrigin}/rekber/${escrow.caseId}`
     });
   } catch (error) {
     logApiCall("POST", "/api/rekber/create", 500, timer.end(), context);

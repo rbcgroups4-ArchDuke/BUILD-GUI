@@ -1,5 +1,5 @@
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import { TopNavbar } from "@/components/top-navbar";
+import { TopNavbar } from "@/components/layout/top-navbar";
 import { ReportsTable } from "@/components/dashboard/reports-table";
 import { listReportedAccounts } from "@/lib/mock-data/store";
 

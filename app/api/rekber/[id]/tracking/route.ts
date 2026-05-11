@@ -26,6 +26,11 @@ export async function POST(
       status: newStatus
     });
 
+    if (!updated) {
+      logApiCall("POST", `/api/rekber/${id}/tracking`, 500, timer.end(), requestContext);
+      return NextResponse.json({ error: "Failed to update rekber case" }, { status: 500 });
+    }
+
     logAction("tracking_update", {
       action: "tracking_update",
       resource: `escrow_${id}`,

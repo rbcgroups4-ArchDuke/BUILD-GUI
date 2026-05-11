@@ -1,4 +1,6 @@
 import type { ChatSenderRole, Dispute, EscrowCase, RekberChatMessage } from "@/types";
+import { detectSuspiciousRekberSignals } from "@/lib/ai/rekber-assistant";
+import { REKBER_ASSISTANT_NAME } from "@/lib/rekber/assistant-config";
 import {
   accounts,
   analystCases,
@@ -52,7 +54,7 @@ export function getEscrowCase(id: string) {
       sellerAccount: "1234567890",
       buyerAccount: "6611223344",
       amount: 6500000,
-      escrowFee: 65000,
+      escrowFee: 100000,
       courier: "JNE",
       trackingNumber: undefined,
       status: "Link Created",
@@ -119,6 +121,118 @@ export function createOrUpdateDispute(caseId: string, input: Partial<Dispute>) {
   return dispute;
 }
 
+function hasTransferProof(text: string) {
+  return /(bukti transfer|foto transfer|struk transfer|receipt|screenshot transfer|sudah transfer|sudah bayar|transfer bank|bukti tf)/.test(text);
+}
+
+function hasShippingProof(text: string) {
+  return /(nomor resi|resi|video packing|foto packing|bukti pengiriman|sudah kirim|barang dikirim|jne|j&t|sicepat|anteraja)/.test(text);
+}
+
+function hasBuyerReceivedConfirmation(text: string) {
+  return /(barang sudah diterima|barang diterima|sudah diterima|kondisi baik|barang aman|sesuai deskripsi|barang sesuai)/.test(text);
+}
+
+function hasPayoutDetails(text: string) {
+  return /(bca|bri|bni|mandiri|seabank|bank|dana|gopay|ovo|norek|nomor rekening|atas nama)/.test(text) && /\d{6,}/.test(text);
+}
+
+function buildChatMetadata(senderRole: ChatSenderRole, message: string) {
+  const text = message.toLowerCase();
+
+  if (senderRole === "buyer" && hasTransferProof(text)) {
+    return {
+      attachmentType: "image",
+      attachmentUrl: "/demo/images/simulasi-transfer-6600000.png",
+      attachmentLabel: "Bukti transfer simulasi Rp 6.600.000"
+    } satisfies Record<string, string>;
+  }
+
+  if (senderRole === "buyer" && hasBuyerReceivedConfirmation(text)) {
+    return {
+      attachmentType: "video",
+      attachmentUrl: "/demo/videos/simulasivideounboxing.mp4",
+      attachmentLabel: "simulasivideounboxing.mp4"
+    } satisfies Record<string, string>;
+  }
+
+  return undefined;
+}
+
+function extractTrackingNumber(text: string) {
+  const match = text.match(/[A-Z]{2,6}[-\s]?\d{4,}[-\s]?[A-Z0-9]{0,6}/i);
+  return match ? match[0].replace(/\s+/g, "-") : undefined;
+}
+
+function pushAutomatedMessage(
+  messages: RekberChatMessage[],
+  caseId: string,
+  senderRole: ChatSenderRole,
+  senderName: string,
+  message: string,
+  metadata?: Record<string, string | number | boolean>
+) {
+  messages.push({
+    messageId: `${caseId}-CHAT-${String(messages.length + 1).padStart(3, "0")}`,
+    caseId,
+    senderRole,
+    senderName,
+    message,
+    timestamp: new Date(Date.now() + messages.length * 800).toISOString(),
+    metadata
+  });
+}
+
+function maybeAdvanceEscrowStatus(caseId: string, senderRole: ChatSenderRole, message: string) {
+  const escrow = getEscrowCase(caseId);
+  if (!escrow) return undefined;
+
+  const text = message.toLowerCase();
+
+  if (senderRole === "buyer" && hasTransferProof(text) && ["Link Created", "Draft"].includes(escrow.status)) {
+    return updateEscrowCase(caseId, { status: "Funds Secured" });
+  }
+
+  if (senderRole === "seller" && hasShippingProof(text) && ["Funds Secured", "Waiting Shipment"].includes(escrow.status)) {
+    return updateEscrowCase(caseId, {
+      status: "In Transit",
+      trackingNumber: extractTrackingNumber(message) ?? escrow.trackingNumber
+    });
+  }
+
+  if (senderRole === "buyer" && hasBuyerReceivedConfirmation(text) && ["In Transit", "Funds Secured", "Waiting Buyer Confirmation"].includes(escrow.status)) {
+    return updateEscrowCase(caseId, { status: "Delivered" });
+  }
+
+  if (senderRole === "seller" && hasPayoutDetails(text) && ["Delivered", "Auto-release Pending", "Waiting Buyer Confirmation"].includes(escrow.status)) {
+    return updateEscrowCase(caseId, { status: "Released to Seller" });
+  }
+
+  return escrow;
+}
+
+function buildTransactionSummary(escrow: EscrowCase) {
+  const total = escrow.amount + escrow.escrowFee;
+  return [
+    "Format transaksi Rekber:",
+    `Penjual: ${escrow.sellerUsername}`,
+    `Pembeli: ${escrow.buyerUsername}`,
+    `Barang: ${escrow.itemName}`,
+    `Deskripsi: ${escrow.itemDescription}`,
+    `Harga barang: ${new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(escrow.amount)}`,
+    `Biaya admin: ${new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(escrow.escrowFee)}`,
+    `Total pembayaran: ${new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(total)}`
+  ].join("\n");
+}
+
+function buildBuyerUnboxingAcknowledgement() {
+  return [
+    "Terima kasih atas konfirmasinya.",
+    "Bukti video unboxing pembeli sudah saya terima dan kondisi barang dinyatakan baik.",
+    "Saya lanjutkan ke tahap pencairan dana untuk penjual."
+  ].join("\n");
+}
+
 function initialChatMessages(escrow: EscrowCase): RekberChatMessage[] {
   const baseTime = new Date(escrow.createdAt).getTime();
   return [
@@ -126,9 +240,9 @@ function initialChatMessages(escrow: EscrowCase): RekberChatMessage[] {
       messageId: `${escrow.caseId}-CHAT-001`,
       caseId: escrow.caseId,
       senderRole: "ai",
-      senderName: "mAIst",
+      senderName: REKBER_ASSISTANT_NAME,
       message:
-        `Ruang Rekber resmi dibuat untuk ${escrow.itemName}. Saya akan menjadi penengah otomatis. Pembeli hanya membayar lewat tombol pembayaran di aplikasi bank, bukan lewat screenshot atau rekening chat luar.`,
+        `Halo, saya ${REKBER_ASSISTANT_NAME} dari AI Rekber. Room resmi untuk transaksi ${escrow.itemName} sudah aktif. Silakan lanjutkan transaksi di room ini, dan pembayaran hanya melalui halaman Rekber resmi.`,
       timestamp: new Date(baseTime + 60_000).toISOString()
     },
     {
@@ -142,18 +256,18 @@ function initialChatMessages(escrow: EscrowCase): RekberChatMessage[] {
     {
       messageId: `${escrow.caseId}-CHAT-003`,
       caseId: escrow.caseId,
-      senderRole: "buyer",
-      senderName: "Pembeli",
-    message: "Saya setuju pakai Rekber Bank. Tolong mAIst pantau sampai barang/data diterima.",
+      senderRole: "ai",
+      senderName: REKBER_ASSISTANT_NAME,
+      message: buildTransactionSummary(escrow),
       timestamp: new Date(baseTime + 180_000).toISOString()
     },
     {
       messageId: `${escrow.caseId}-CHAT-004`,
       caseId: escrow.caseId,
       senderRole: "ai",
-      senderName: "mAIst",
+      senderName: REKBER_ASSISTANT_NAME,
       message:
-        "Aturan aman: penjual jangan kirim barang, kode akun, email, password, atau data digital sebelum status di aplikasi berubah menjadi Funds Secured. Bukti transfer dari chat luar tidak cukup.",
+        `Total yang harus dibayarkan pembeli adalah ${new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(escrow.amount + escrow.escrowFee)}. Setelah pembeli kirim bukti transfer, saya akan lanjutkan ke tahap pengiriman barang.`,
       timestamp: new Date(baseTime + 240_000).toISOString()
     }
   ];
@@ -170,62 +284,136 @@ export function getRekberChatMessages(caseId: string) {
 
 function aiReplyFor(escrow: EscrowCase, message: string, senderRole: ChatSenderRole): string {
   const text = message.toLowerCase();
-  const fundsSecured = ["Funds Secured", "Waiting Shipment", "In Transit", "Delivered", "Waiting Buyer Confirmation", "Auto-release Pending"].includes(escrow.status);
+  const suspiciousSignals = detectSuspiciousRekberSignals(message);
 
-  if (/(sudah transfer|sudah bayar|bukti|struk|receipt|dana sudah masuk|noreff|ref|reff)/.test(text)) {
-    return fundsSecured
-      ? "Saya sudah melihat status dana aman di sistem bank: Funds Secured. Penjual boleh lanjut kirim barang atau data sesuai kesepakatan, lalu masukkan resi/tracking di aplikasi."
-      : "Saya belum melihat dana masuk di sistem bank. Jangan kirim barang, akun, password, OTP, atau data digital hanya berdasarkan screenshot. Pembeli harus menekan tombol pembayaran resmi di halaman Rekber.";
+  if (suspiciousSignals.length > 0) {
+    return `${REKBER_ASSISTANT_NAME} AI Rekber tidak memproses password, OTP, PIN, email pemulihan, atau kode sekunder di chat. Jika transaksi sudah aman, lanjutkan hanya dengan detail pencairan resmi dan bukti serah-terima yang diperlukan.`;
   }
 
-  if (/(kirim|serahkan|akun|password|email|otp|data)/.test(text)) {
-    return fundsSecured
-      ? "Status dana sudah aman. Penjual tetap kirim data hanya lewat prosedur yang disepakati, simpan bukti serah-terima, dan jangan bagikan OTP."
-      : "Tahan dulu. Dana belum tercatat aman di escrow bank. AI Rekber tidak mengizinkan pelepasan barang atau data sebelum pembayaran resmi terkonfirmasi di aplikasi.";
+  if (senderRole === "buyer" && hasTransferProof(text) && escrow.status === "Funds Secured") {
+    return "Dana sudah saya terima di sistem Rekber. Silakan penjual segera mengirim barang dan kirimkan bukti pengiriman ke chat ini, misalnya nomor resi, foto packing, atau video packing.";
   }
 
-  if (/(resi|tracking|kurir|jne|j&t|sicepat|anteraja|dikirim)/.test(text)) {
-    return "Jika barang sudah dikirim, penjual perlu mengisi nomor resi di halaman tracking. Saya akan memantau status mocked courier dan menahan dana sampai delivered atau ada dispute.";
+  if (senderRole === "seller" && hasShippingProof(text) && escrow.status === "In Transit") {
+    return "Bukti pengiriman sudah saya terima. Pembeli silakan tunggu barang tiba, lalu konfirmasi di chat ini jika barang sudah diterima dalam kondisi baik.";
+  }
+
+  if (senderRole === "buyer" && hasBuyerReceivedConfirmation(text) && escrow.status === "Delivered") {
+    return buildBuyerUnboxingAcknowledgement();
+  }
+
+  if (senderRole === "seller" && hasPayoutDetails(text) && escrow.status === "Released to Seller") {
+    return "Baik, detail rekening pencairan sudah saya catat. Dana sedang saya kirim ke rekening penjual. Transaksi selesai, terima kasih telah menggunakan AI Rekber.";
+  }
+
+  if (senderRole === "buyer" && /(transfer|bayar|bukti)/.test(text)) {
+    return "Terima kasih atas konfirmasinya. Jika pembayaran sudah dilakukan, mohon kirim bukti transfer bank beserta foto atau screenshot transfer di chat ini agar saya cek ke sistem Rekber.";
+  }
+
+  if (senderRole === "seller" && /(kirim barang|siap kirim|packing|resi)/.test(text) && ["Funds Secured", "Waiting Shipment"].includes(escrow.status)) {
+    return "Silakan penjual kirim barang tersebut dan sertakan bukti pengiriman di chat ini, misalnya nomor resi, foto packing, atau video packing.";
   }
 
   if (/(komplain|dispute|kosong|tidak sesuai|salah barang|hold|tahan)/.test(text)) {
-    return "Saya akan membantu membuat ringkasan dispute sebagai decision support. Dana harus ditahan dan eskalasi ke staff bank jika bukti pembeli menunjukkan barang/data tidak sesuai.";
+    return "Baik, saya bantu buka proses sengketa. Dana akan ditahan sementara sambil bukti pembeli dan penjual ditinjau oleh staff bank.";
   }
 
   if (senderRole === "seller") {
-    return "Catatan untuk penjual: tunggu indikator Funds Secured di aplikasi ini. Jangan percaya grup rekber luar, screenshot transfer, atau pesan yang memaksa pengiriman cepat.";
+    return "Baik penjual, mohon tunggu konfirmasi pembayaran resmi dari sistem Rekber. Setelah dana diterima, saya akan bantu arahkan tahap pengiriman barang dan pencairan dana.";
   }
 
-  return "Catatan untuk pembeli: lakukan pembayaran hanya melalui tombol resmi di halaman Rekber. AI Rekber membantu memandu transaksi, tetapi keputusan dispute tetap oleh staff bank.";
+  return "Baik pembeli, silakan lanjut sesuai alur Rekber resmi. Jika pembayaran sudah dilakukan, kirim bukti transfer di chat ini agar saya bisa lanjutkan ke tahap pengiriman barang.";
 }
 
-export function addRekberChatMessage(caseId: string, senderRole: ChatSenderRole, message: string) {
+function addSimulationFollowUps(messages: RekberChatMessage[], escrow: EscrowCase, senderRole: ChatSenderRole, message: string) {
+  const text = message.toLowerCase();
+
+  if (senderRole === "buyer" && hasTransferProof(text) && escrow.status === "Funds Secured") {
+    const shippingUpdate = updateEscrowCase(escrow.caseId, {
+      status: "In Transit",
+      trackingNumber: "JNE-88214409-ID"
+    }) ?? escrow;
+
+    pushAutomatedMessage(
+      messages,
+      escrow.caseId,
+      "seller",
+      "Penjual",
+      `Baik ${REKBER_ASSISTANT_NAME}, barang sudah saya kirim. No resi JNE-88214409-ID, foto packing dan video packing sudah saya kirim di chat ini.`
+    );
+    pushAutomatedMessage(
+      messages,
+      escrow.caseId,
+      "ai",
+      REKBER_ASSISTANT_NAME,
+      "Bukti pengiriman dari penjual sudah saya terima. Pembeli silakan tunggu barang tiba, lalu kirim konfirmasi di chat ini jika barang sudah diterima dalam kondisi baik.",
+      { automated: true, escrowStatus: shippingUpdate.status }
+    );
+    return;
+  }
+
+  if (senderRole === "buyer" && hasBuyerReceivedConfirmation(text) && escrow.status === "Delivered") {
+    pushAutomatedMessage(
+      messages,
+      escrow.caseId,
+      "ai",
+      REKBER_ASSISTANT_NAME,
+      "Penjual, silakan kirim detail rekening pencairan dana dengan format berikut:\nBank:\nNomor Rekening:\nAtas Nama:",
+      { automated: true, escrowStatus: escrow.status }
+    );
+
+    pushAutomatedMessage(
+      messages,
+      escrow.caseId,
+      "seller",
+      "Penjual",
+      `Baik ${REKBER_ASSISTANT_NAME}, berikut detail pencairan dana:\nBank: BRI\nNomor Rekening: 901388301900\nAtas Nama: Muhamad Arga`
+    );
+
+    const payoutUpdate = updateEscrowCase(escrow.caseId, { status: "Released to Seller" }) ?? escrow;
+
+    pushAutomatedMessage(
+      messages,
+      escrow.caseId,
+      "ai",
+      REKBER_ASSISTANT_NAME,
+      "Baik, detail rekening pencairan sudah saya catat. Dana sedang saya kirim ke rekening penjual. Transaksi selesai, terima kasih telah menggunakan AI Rekber.",
+      { automated: true, escrowStatus: payoutUpdate.status }
+    );
+  }
+}
+
+export function addRekberChatMessage(caseId: string, senderRole: ChatSenderRole, message: string, aiReply?: string) {
   const escrow = getEscrowCase(caseId);
   if (!escrow) return undefined;
   const messages = getRekberChatMessages(caseId);
   if (!messages) return undefined;
-  const senderName = senderRole === "seller" ? "Penjual" : senderRole === "buyer" ? "Pembeli" : "mAIst";
+  const senderName = senderRole === "seller" ? "Penjual" : senderRole === "buyer" ? "Pembeli" : REKBER_ASSISTANT_NAME;
   const userMessage: RekberChatMessage = {
     messageId: `${caseId}-CHAT-${String(messages.length + 1).padStart(3, "0")}`,
     caseId,
     senderRole,
     senderName,
     message,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    metadata: buildChatMetadata(senderRole, message)
   };
   messages.push(userMessage);
+  const latestEscrow = maybeAdvanceEscrowStatus(caseId, senderRole, message) ?? escrow;
 
   if (senderRole !== "ai") {
     messages.push({
       messageId: `${caseId}-CHAT-${String(messages.length + 1).padStart(3, "0")}`,
       caseId,
       senderRole: "ai",
-      senderName: "mAIst",
-      message: aiReplyFor(escrow, message, senderRole),
+      senderName: REKBER_ASSISTANT_NAME,
+      message: aiReply ?? aiReplyFor(latestEscrow, message, senderRole),
       timestamp: new Date(Date.now() + 800).toISOString(),
-      metadata: { automated: true, escrowStatus: escrow.status }
+      metadata: { automated: true, escrowStatus: latestEscrow.status }
     });
   }
+
+  addSimulationFollowUps(messages, latestEscrow, senderRole, message);
 
   return messages;
 }

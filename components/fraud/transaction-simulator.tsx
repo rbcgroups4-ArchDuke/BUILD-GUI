@@ -7,8 +7,8 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RiskScoreCard } from "@/components/risk-score-card";
-import { FraudReasonList } from "@/components/fraud-reason-list";
+import { RiskScoreCard } from "@/components/fraud/risk-score-card";
+import { FraudReasonList } from "@/components/fraud/fraud-reason-list";
 import type { RiskCheckResult } from "@/types";
 
 export function TransactionSimulator() {
@@ -19,19 +19,25 @@ export function TransactionSimulator() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
+    if (loading) return; // Prevent multiple submissions
     setLoading(true);
-    const response = await fetch("/api/transfer/simulate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        recipientAccount,
-        amount: Number(amount),
-        description: "Pembayaran iPhone 13 via Facebook marketplace",
-        platform: "Facebook"
-      })
-    });
-    setResult(await response.json());
-    setLoading(false);
+    try {
+      const response = await fetch("/api/transfer/simulate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recipientAccount,
+          amount: Number(amount),
+          description: "Pembayaran iPhone 13 via Facebook marketplace",
+          platform: "Facebook"
+        })
+      });
+      setResult(await response.json());
+    } catch (error) {
+      console.error("Failed to simulate transfer:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

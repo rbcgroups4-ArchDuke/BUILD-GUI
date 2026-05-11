@@ -1,6 +1,6 @@
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import { HybridFdsLab } from "@/components/dashboard/hybrid-fds-lab";
-import { TopNavbar } from "@/components/top-navbar";
+import { LazyHybridFdsLab } from "@/components/dashboard/lazy-hybrid-fds-lab";
+import { TopNavbar } from "@/components/layout/top-navbar";
 
 export default function HybridFdsPage() {
   return (
@@ -16,7 +16,7 @@ export default function HybridFdsPage() {
               Modul ini menambahkan fitur dari proposal: ekstraksi fitur perilaku nasabah, skor anomali historis, final risk score gabungan, Explainable AI, auto stream transaksi, dan aksi analis untuk menekan false positive.
             </p>
           </div>
-          <HybridFdsLab />
+          <LazyHybridFdsLab />
         </section>
       </div>
     </main>

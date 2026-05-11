@@ -1,7 +1,7 @@
 import { Filter } from "lucide-react";
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import { TopNavbar } from "@/components/top-navbar";
-import { AccountGraph } from "@/components/dashboard/account-graph";
+import { TopNavbar } from "@/components/layout/top-navbar";
+import { LazyAccountGraph } from "@/components/dashboard/lazy-account-graph";
 import { Card, CardContent } from "@/components/ui/card";
 import { dashboardGraph } from "@/lib/mock-data/store";
 
@@ -27,7 +27,7 @@ export default function GraphPage() {
               ))}
             </CardContent>
           </Card>
-          <AccountGraph nodes={graph.nodes} edges={graph.edges} />
+          <LazyAccountGraph nodes={graph.nodes} edges={graph.edges} />
         </section>
       </div>
     </main>

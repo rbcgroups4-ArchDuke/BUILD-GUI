@@ -5,11 +5,11 @@ import { motion } from "framer-motion";
 import { AlertTriangle, CheckCircle2, Network, ShieldCheck, Wallet } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { RiskScoreCard } from "@/components/risk-score-card";
+import { RiskScoreCard } from "@/components/fraud/risk-score-card";
 
 function AnimatedLines() {
   return (
-    <svg className="absolute inset-0 h-full w-full opacity-60" aria-hidden="true">
+    <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-60" aria-hidden="true">
       <defs>
         <linearGradient id="line" x1="0" x2="1" y1="0" y2="0">
           <stop offset="0%" stopColor="#2563eb" stopOpacity="0" />
@@ -36,10 +36,10 @@ function AnimatedLines() {
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-[#020617]">
-      <div className="absolute inset-0 bg-radial-grid" />
-      <div className="animated-grid absolute inset-0" />
+      <div className="pointer-events-none absolute inset-0 bg-radial-grid" />
+      <div className="pointer-events-none animated-grid absolute inset-0" />
       <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-7xl items-center gap-10 px-4 pb-44 pt-20 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:pb-48 lg:pt-20">
-        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="relative z-10">
           <p className="mb-4 inline-flex rounded-full border border-cyan-400/25 bg-cyan-500/10 px-3 py-1 text-sm text-cyan-100">
             Pendukung keputusan fraud setara bank untuk social commerce
           </p>
@@ -68,7 +68,7 @@ export function HeroSection() {
           initial={{ opacity: 0, scale: 0.96, y: 24 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.12 }}
-          className="relative min-h-[560px]"
+          className="relative z-10 min-h-[560px]"
         >
           <AnimatedLines />
           <div className="absolute right-0 top-10 w-[86%] animate-float">

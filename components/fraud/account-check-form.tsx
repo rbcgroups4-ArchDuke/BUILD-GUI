@@ -8,8 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { RiskScoreCard } from "@/components/risk-score-card";
-import { FraudReasonList } from "@/components/fraud-reason-list";
+import { RiskScoreCard } from "@/components/fraud/risk-score-card";
+import { FraudReasonList } from "@/components/fraud/fraud-reason-list";
 import { maskAccount } from "@/lib/utils";
 import type { PlatformSource, RiskCheckResult } from "@/types";
 
@@ -23,14 +23,20 @@ export function AccountCheckForm() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
+    if (loading) return; // Prevent multiple submissions
     setLoading(true);
-    const response = await fetch("/api/risk/check", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ accountNumber, amount: Number(amount), description, platform })
-    });
-    setResult(await response.json());
-    setLoading(false);
+    try {
+      const response = await fetch("/api/risk/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accountNumber, amount: Number(amount), description, platform })
+      });
+      setResult(await response.json());
+    } catch (error) {
+      console.error("Failed to check risk:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

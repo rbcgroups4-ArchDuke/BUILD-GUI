@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Bot, ShieldCheck, Truck, MessageSquare } from "lucide-react";
-import { TopNavbar } from "@/components/top-navbar";
+import { TopNavbar } from "@/components/layout/top-navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
-import { RekberPaymentPanel } from "@/components/rekber-payment-panel";
-import { StatusBadge } from "@/components/status-badge";
+import { RekberPaymentPanel } from "@/components/rekber/rekber-payment-panel";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { formatDateTime, formatRupiah, maskAccount } from "@/lib/utils";
 import { getEscrowCase } from "@/lib/mock-data/store";
 
